@@ -1,3 +1,8 @@
+#__author__ = "David Bradshaw & Nick Dickens"
+#__copyright__ = "Copyright 2019, David J. Bradshaw II & Nicholas J. Dickens"
+#__email__ = "dbradshaw2015@fau.edu"
+#__license__ = "MIT"
+
 import sys
 
 
