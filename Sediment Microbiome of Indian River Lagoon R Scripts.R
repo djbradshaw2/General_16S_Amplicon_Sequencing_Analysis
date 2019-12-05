@@ -1,3 +1,8 @@
+#__author__ = "David Bradshaw"
+#__copyright__ = "Copyright 2019, David J. Bradshaw II"
+#__email__ = "dbradshaw2015@fau.edu"
+#__license__ = "MIT"
+
 #Load libraries#
 library(phyloseq)
 library(indicspecies)
