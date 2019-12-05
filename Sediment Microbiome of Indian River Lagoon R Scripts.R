@@ -56,13 +56,25 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
 }
 
 ####UPLOADING AND GENERAL EDITS####
-#Import input files from QIIME2#
+#Import input files from QIIME2 if snakefile worked to phyloseq.biom#
 BIOM <- import_biom(file.choose()) #phyloseq.biom
-TREE =  read_tree(file.choose()) #tree.nwk
+TREE =  read_tree(file.choose()) #file = tree -> tree.nwk
 META <- import_qiime_sample_data(file.choose()) #map.txt
 
 #Merge data#
 LWSSdata <- merge_phyloseq (BIOM,TREE,META)
+
+#Alternative Uploading if snakefile did not work to phyloseq.biom#
+asv_table = read.delim(file.choose(), row.names=1, header = T) #file = "feature-table.tsv    #open file in Excel/TextEdit and remove 1st row in file before import
+taxa_table = read.delim(file.choose(), row.names = 1) #file= "taxonomy -> taxonomy2.tsv"   #need to delete Confidence column and separate Taxonomy column using "Text to Columns" (Data tab) in Excel by "semicolon" and fill column headers with taxonomic ranks
+taxa_table = as.matrix(taxa_table)
+DottedMETA = read.delim(file.choose(), row.names=1) #mapping file
+dotted_meta = sample_data(DottedMETA) 
+ASV = otu_table(asv_table, taxa_are_rows = TRUE)
+TAX = tax_table(taxa_table)
+TREE =  read_tree(file.choose()) #file = tree -> tree.nwk
+
+LWSSdata <- merge_phyloseq(ASV, TAX, dotted_meta, TREE)
 
 #Change taxa names if needed#
 colnames(tax_table(LWSSdata))
@@ -137,9 +149,9 @@ ggplot(Temp_SS, aes(x=Sampling.Period, y=value, fill=factor(Year, levels =c("201
   geom_bar(position=position_dodge(), stat="identity", colour="black", size=0.3)+
   geom_errorbar(aes(ymin=value-se, ymax=value+se), size=0.3, width=0.2, position=position_dodge(0.9))+
   xlab("Sampling Period")+
-  ylab("Temperature (°C)")+
+  ylab("Temperature (Â°C)")+
   theme(axis.text.x  = element_text(angle=45, hjust=1))+
-  ggtitle("IRL Wide NWS Average Temperature (°C) by Sampling Period") +
+  ggtitle("IRL Wide NWS Average Temperature (Â°C) by Sampling Period") +
   theme(plot.title = element_text(hjust = 0.5)) +
   coord_cartesian(ylim=c(18,30))+
   scale_fill_manual(name="Year(s)", values=(c("chocolate", "seagreen", "chocolate1", "seagreen1", "grey20")), breaks=c("2016", "2017a", "2017b", "2018", "1990-2018"))
@@ -247,7 +259,7 @@ ggplot(meltPWST_EbyS, aes(x=Estuary.Sampling, y=value, color=Estuary.Sampling)) 
   xlab("Estuary by Sampling Period") +
   scale_color_manual(values=c("seagreen4", "seagreen3", "seagreen2", "seagreen1", "chocolate4", "chocolate3", "chocolate2", "chocolate1"), limits=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("IRL Aug/Sept 2016", "IRL Mar/Apr 2017", "IRL Oct/Nov 2017", "IRL Apr 2018", "SLE Aug/Sept 2016", "SLE Mar/Apr 2017", "SLE Oct/Nov 2017", "SLE Apr 2018")) +
   ggtitle("Porewater Salinty and Sediment Temperature by Estuary by Sampling Period") +
-  ylab("Porewater Salinity (ppt) / Sediment Temperature(°C)") +
+  ylab("Porewater Salinity (ppt) / Sediment Temperature(Â°C)") +
   theme(plot.title = element_text(hjust = 0.5)) + 
   scale_x_discrete( limits=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("IRL Aug/Sept 2016", "IRL Mar/Apr 2017", "IRL Oct/Nov 2017", "IRL Apr 2018", "SLE Aug/Sept 2016", "SLE Mar/Apr 2017", "SLE Oct/Nov 2017", "SLE Apr 2018"))
 
@@ -272,7 +284,7 @@ ggplot(meltPWST_Loc, aes(x=Location, y=value, color=Location)) +
   xlab("Location") +
   scale_color_manual(values=c("seagreen4", "seagreen3", "seagreen2", "seagreen1", "chocolate4"), limits=c("North", "North Central", "South Central", "South", "SLE")) +
   ggtitle("Porewater Salinty and Sediment Temperature by Location") +
-  ylab("Porewater Salinity (ppt) / Sediment Temperature(°C)") +
+  ylab("Porewater Salinity (ppt) / Sediment Temperature(Â°C)") +
   scale_x_discrete( limits=c("North", "North Central", "South Central", "South", "SLE")) +
   theme(plot.title = element_text(hjust = 0.5))
 
@@ -317,7 +329,7 @@ ggplot(data = LWSS_Enviro, aes( x = Loss.On.Ignition.aka.Total.Organic.Matter, y
   geom_hline(yintercept=65, linetype="dashed", color = "red") +
   geom_vline(xintercept=10, linetype="dashed", color = "blue") +
   xlab("Total Organic Matter (%)") +
-  ylab("Copper Concentration (µg/g)") +
+  ylab("Copper Concentration (Âµg/g)") +
   ggtitle("Copper Concentration vs. Total Organic Matter") +
   scale_colour_manual(values=c("midnightblue", "blue", "red", "purple", "yellow", "violet", "maroon", "darkgreen", "dodgerblue", "gold",  "moccasin",  "darkgray", "powderblue", "green", "lightgray", "black", "slateblue", "greenyellow", "lightseagreen")) +
   theme(plot.title = element_text(hjust = 0.5)) + 
