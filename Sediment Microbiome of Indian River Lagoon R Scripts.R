@@ -3,6 +3,10 @@
 #__email__ = "dbradshaw2015@fau.edu"
 #__license__ = "MIT"
 
+#NOTE: These scripts concern just the samples are found in the NCBI SRA Archive Number , . 
+#When analysis was done for disseration QIIME2 was ran with all 483 disseration samples, 
+#thus differences in sequences and ASVs may exist if this is only data set being analyzed#
+
 #Load libraries#
 library(phyloseq)
 library(indicspecies)
