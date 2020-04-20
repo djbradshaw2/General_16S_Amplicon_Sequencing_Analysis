@@ -9,17 +9,12 @@
 
 #Load libraries#
 library(phyloseq)
-library(indicspecies)
 library(vegan)
 library(ggplot2)
-library(plyr)
 library(tidyverse)
 library(FSA)
 library(reshape)
 library(ggplot2)
-library(Hmisc)
-library(gdata)
-library(tidyverse)
 
 ###LOAD UP SUMMARYSE FUNCTION###
 ## Gives count, mean, standard deviation, standard error of the mean, and confidence interval (default 95%).
