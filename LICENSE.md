@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2018 Nick Dickens
+Copyright (c) 2018 David J Bradshaw II
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
