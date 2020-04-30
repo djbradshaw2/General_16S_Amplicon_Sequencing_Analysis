@@ -254,19 +254,70 @@ meltPWST_EbyS <- melt(meltPWST_EbyS, id=c("Estuary.Sampling"))
 #Create labels for use in graph#
 PWST_EbySlabels <- c(Porewater.salinity = "Porewater Salinity", Sediment.Temperature = "Sediment Temperature")
 
-#Plot graph#
+#Make tables to add elements to graphs#
+dat_text_fig_2A <- data.frame(
+  label = c("a", "b", "c", "b", "d", "f", "d", "f", "a", "b", "b", "c", "d", "e", "e", "f"),
+  variable   = c("Porewater.salinity","Porewater.salinity","Porewater.salinity","Porewater.salinity", "Porewater.salinity","Porewater.salinity","Porewater.salinity","Porewater.salinity", "Sediment.Temperature","Sediment.Temperature","Sediment.Temperature","Sediment.Temperature","Sediment.Temperature","Sediment.Temperature","Sediment.Temperature","Sediment.Temperature"),
+  Estuary.Sampling     = c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18", "IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"),
+  x     = c(1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8),
+  y     = c(44, 49, 43, 50, 21, 39, 10, 39, 34, 28, 29, 29, 32, 28, 26, 28)
+)
+
+line_text_fig_2A <- data.frame(
+  label = c("IRL", "SLE", "IRL", "SLE"),
+  variable   = c("Porewater.salinity","Porewater.salinity","Sediment.Temperature","Sediment.Temperature"),
+  Estuary.Sampling     = c( "IRL-W17", "SLE-W17", "IRL-W17", "SLE-W17"),
+  x     = c(2.5, 6.5, 2.5, 6.5),
+  y     = c(54, 43, 37, 35)
+)
+
+segment_fig_2A <- data.frame(
+  variable   = c("Porewater.salinity","Porewater.salinity","Sediment.Temperature","Sediment.Temperature"),
+  Estuary.Sampling     = c( "IRL-W17", "SLE-W17", "IRL-W17", "SLE-W17"),
+  x     = c(0, 4.55, 0, 4.55),
+  xend  = c(4.45, 8.5, 4.45, 8.5),
+  y     = c(52, 41, 35, 33),
+  yend  = c(52, 41, 35, 33)
+)
+
+#Make color graph#
 ggplot(meltPWST_EbyS, aes(x=Estuary.Sampling, y=value, color=Estuary.Sampling)) +
+    geom_boxplot() +
+  facet_wrap(~variable, labeller=labeller(variable=PWST_EbySlabels)) +
+  theme(strip.text.x = element_text(size = 16))+
+  theme(axis.text.x  = element_text(angle=45, hjust=1)) + 
+  xlab("Estuary by Sampling Period") +
+  scale_color_manual(name="Estuary by Sampling Period", values=c("seagreen4", "seagreen3", "seagreen2", "seagreen1", "chocolate4", "chocolate3", "chocolate2", "chocolate1"), limits=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("IRL Aug/Sept 2016", "IRL Mar/Apr 2017", "IRL Oct/Nov 2017", "IRL Apr 2018", "SLE Aug/Sept 2016", "SLE Mar/Apr 2017", "SLE Oct/Nov 2017", "SLE Apr 2018")) +
+  ylab("Porewater Salinity (ppt) / Sediment Temperature(°C)") +
+  scale_x_discrete( limits=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("IRL Aug/Sept 2016", "IRL Mar/Apr 2017", "IRL Oct/Nov 2017", "IRL Apr 2018", "SLE Aug/Sept 2016", "SLE Mar/Apr 2017", "SLE Oct/Nov 2017", "SLE Apr 2018"))+ 
+  geom_text(data= dat_text_fig_2.5A, mapping = aes(x = x, y = y, label = label),show.legend = F, size=8)+
+theme(axis.text=element_text(size=14), axis.title=element_text(size=16), legend.text=element_text(size=12), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=14))
+
+#Export as a tiff#                        
+tiff('LWS PWS and Sed Temp by Est by SP C.tiff', units="in", width=18, height=12, res=300)
+#plot(x,y)
+dev.off()
+                         
+#Make grey-scale graph#
+ggplot(meltPWST_EbyS, aes(x=Estuary.Sampling, y=value)) +
   geom_boxplot() +
   facet_wrap(~variable, labeller=labeller(variable=PWST_EbySlabels)) +
+  theme(strip.text.x = element_text(size = 15))+
   theme(axis.text.x  = element_text(angle=45, hjust=1)) + 
-  scale_color_discrete(name="Estuary by Sampling Period", breaks=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("IRL Aug/Sept 2016", "IRL Mar/Apr 2017", "IRL Oct/Nov 2017", "IRL Apr 2018", "SLE Aug/Sept 2016", "SLE Mar/Apr 2017", "SLE Oct/Nov 2017", "SLE Apr 2018")) +
-  xlab("Estuary by Sampling Period") +
-  scale_color_manual(values=c("seagreen4", "seagreen3", "seagreen2", "seagreen1", "chocolate4", "chocolate3", "chocolate2", "chocolate1"), limits=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("IRL Aug/Sept 2016", "IRL Mar/Apr 2017", "IRL Oct/Nov 2017", "IRL Apr 2018", "SLE Aug/Sept 2016", "SLE Mar/Apr 2017", "SLE Oct/Nov 2017", "SLE Apr 2018")) +
-  ggtitle("Porewater Salinty and Sediment Temperature by Estuary by Sampling Period") +
+  xlab("Sampling Period") +
   ylab("Porewater Salinity (ppt) / Sediment Temperature(°C)") +
-  theme(plot.title = element_text(hjust = 0.5)) + 
-  scale_x_discrete( limits=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("IRL Aug/Sept 2016", "IRL Mar/Apr 2017", "IRL Oct/Nov 2017", "IRL Apr 2018", "SLE Aug/Sept 2016", "SLE Mar/Apr 2017", "SLE Oct/Nov 2017", "SLE Apr 2018"))
+  scale_x_discrete( limits=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("Aug/Sept 2016", "Mar/Apr 2017", "Oct/Nov 2017", "Apr 2018", "Aug/Sept 2016", "Mar/Apr 2017", "Oct/Nov 2017", "Apr 2018"))+ 
+  geom_text(data= dat_text_fig_2A, mapping = aes(x = x, y = y, label = label),show.legend = F, size=5)+
+  theme(axis.text=element_text(size=13), axis.title=element_text(size=15), legend.text=element_text(size=11), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=13))+
+  geom_text(data= line_text_fig_2A, mapping = aes(x = x, y = y, label = label),show.legend = F, size=5)+
+  geom_segment(data=segment_fig_2A, mapping = aes(x=x, xend=xend, y=y, yend=yend))
 
+#Export as a tiff#                        
+tiff('LWS PWS and Sed Temp by Est by SP GS.tiff', units="in", width=10, height=6, res=300)
+#plot(x,y)
+dev.off()
+                         
+                         
 #Get summary statistics for porewater salinity by Estuary by Sampling Period#
 ddply(LWSS_Enviro, .(Estuary.Sampling), summarise, mean=mean(Porewater.salinity), sd=sd(Porewater.salinity), median=median(Porewater.salinity), IQR=IQR(Porewater.salinity))
 #Get summary statistics for porewater salintiy by Site#
@@ -279,23 +330,73 @@ ddply(LWSS_Enviro, .(Estuary.Sampling), summarise, mean=mean(Sediment.Temperatur
 #Subset and summarize porewater salinity and sediment temperature by Estuary by Sampling Period (melt)#
 meltPWST_Loc <- subset(LWSS_Enviro, select=c("Location","Porewater.salinity", "Sediment.Temperature"))
 meltPWST_Loc <- melt(meltPWST_Loc, id=c("Location"))
-#Make the graph#
+
+#Make tables to add elements to graphs#
+dat_text_fig_2B <- data.frame(
+  label = c("a", "ab", "ab", "b", "c", "ab", "ab", "a", "b", "ab"),
+  variable   = c("Porewater.salinity","Porewater.salinity","Porewater.salinity","Porewater.salinity", "Porewater.salinity", "Sediment.Temperature","Sediment.Temperature","Sediment.Temperature","Sediment.Temperature","Sediment.Temperature"),
+  Location     = c("North", "North Central", "South Central", "South", "SLE", "North", "North Central", "South Central", "South", "SLE"),
+  x     = c(1, 2, 3, 4, 5, 1, 2, 3, 4, 5),
+  y     = c(44, 47, 50, 47, 39, 32, 34, 34, 34, 32)
+)
+
+line_text_fig_2B <- data.frame(
+  label = c("IRL", "IRL"),
+  variable   = c("Porewater.salinity","Sediment.Temperature"),
+  Location     = c("North Central", "North Central"),
+  x     = c(2.5, 2.5),
+  y     = c(54, 38)
+)
+
+segment_fig_2B <- data.frame(
+  variable   = c("Porewater.salinity", "Sediment.Temperature"),
+  Location     = c("North Central", "North Central"),
+  x     = c(0.5, 0.5),
+  xend  = c(4.45, 4.45),
+  y     = c(52, 36),
+  yend  = c(52, 36)
+                         
+#Make color graph#
 ggplot(meltPWST_Loc, aes(x=Location, y=value, color=Location)) +
   geom_boxplot() +
   facet_wrap(~variable, labeller=labeller(variable=PWSTlabels)) +
-  theme(axis.text.x  = element_text(angle=45, hjust=1)) + 
-  scale_color_discrete(name="Location", breaks=c("North", "North Central", "South Central", "South", "SLE")) +
+  theme(strip.text.x = element_text(size = 15))+
+    theme(axis.text.x  = element_text(angle=45, hjust=1)) + 
   xlab("Location") +
-  scale_color_manual(values=c("seagreen4", "seagreen3", "seagreen2", "seagreen1", "chocolate4"), limits=c("North", "North Central", "South Central", "South", "SLE")) +
-  ggtitle("Porewater Salinty and Sediment Temperature by Location") +
+  scale_color_manual(values=c("seagreen4", "seagreen3", "seagreen2", "seagreen1", "chocolate4"), limits=c("North", "North Central", "South Central", "South", "SLE"), labels = c("North IRL", "North Central IRL", "South Central IRL", "South IRL", "SLE")) +
+  ylab("Porewater Salinity (ppt) / Sediment Temperature(°C)") +
+  scale_x_discrete( limits=c("North", "North Central", "South Central", "South", "SLE"), labels = c("North IRL", "North Central IRL", "South Central IRL", "South IRL", "SLE")) +
+  geom_text(data= dat_text_fig_2B, mapping = aes(x = x, y = y, label = label),show.legend = F, size=5)+
+  theme(axis.text=element_text(size=13), axis.title=element_text(size=15), legend.text=element_text(size=11), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=13))
+
+#Export as a tiff#                        
+tiff('LWS PWS and Sed Temp by Loc C.tiff', units="in", width=10, height=6, res=300)
+#plot(x,y)
+dev.off()
+
+#Make grey-scale graph#
+ggplot(meltPWST_Loc, aes(x=Location, y=value)) +
+  geom_boxplot() +
+  facet_wrap(~variable, labeller=labeller(variable=PWSTlabels)) +
+  theme(strip.text.x = element_text(size = 15))+
+    theme(axis.text.x  = element_text(angle=45, hjust=1)) + 
+  xlab("Location") +
   ylab("Porewater Salinity (ppt) / Sediment Temperature(°C)") +
   scale_x_discrete( limits=c("North", "North Central", "South Central", "South", "SLE")) +
-  theme(plot.title = element_text(hjust = 0.5))
-
+  theme(plot.title = element_text(hjust = 0.5))+
+  geom_text(data= dat_text_fig_2B, mapping = aes(x = x, y = y, label = label),show.legend = F, size=5)+
+  theme(axis.text=element_text(size=13), axis.title=element_text(size=15), legend.text=element_text(size=11), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=13))+
+  geom_text(data= line_text_fig_2B, mapping = aes(x = x, y = y, label = label),show.legend = F, size=5)+
+  geom_segment(data=segment_fig_2B, mapping = aes(x=x, xend=xend, y=y, yend=yend))
 #Get summary statistics for porewater salinity by Location#
 ddply(LWSS_Enviro, .(Location), summarise, mean=mean(Porewater.salinity), sd=sd(Porewater.salinity), median=median(Porewater.salinity), IQR=IQR(Porewater.salinity))
 #Get summary statistics for porewater salinity by Location#
 ddply(LWSS_Enviro, .(Location), summarise, mean=mean(Sediment.Temperature), sd=sd(Sediment.Temperature), median=median(Sediment.Temperature), IQR=IQR(Sediment.Temperature))
+
+#Export as a tiff#
+tiff('LWS PWS and Sed Temp by Loc GS.tiff', units="in", width=10, height=6, res=300)
+#plot(x,y)
+dev.off()
 
 ###MAKE FIGURE 3###
 #Subset and summarize muck characteristics by Site (melt)#
@@ -313,7 +414,7 @@ tgc <- summarySE(data=meltMuck, measurevar="value", groupvars=c("variable","Site
 tgc <-as.data.frame(tgc)
 tgc$variable  <- factor(tgc$variable , levels = c("Water.Content","X..fines", "Loss.On.Ignition.aka.Total.Organic.Matter"))
 
-#Make the graph#
+#Make color graph#
 ggplot(tgc, aes(x=Site, y=value, fill=variable))+
   geom_bar(position=position_dodge(), stat="identity", colour="black", size=0.3)+
   geom_errorbar(aes(ymin=value-se, ymax=value+se), size=0.3, width=0.2, position=position_dodge(0.9))+
@@ -324,9 +425,34 @@ ggplot(tgc, aes(x=Site, y=value, fill=variable))+
   geom_hline(yintercept=60, linetype="dashed", color = "darkgreen", size = 1) +
   geom_hline(yintercept=75, linetype="dashed", color = "red", size = 1) +
   geom_hline(yintercept=10, linetype="dashed", color = "dodgerblue", size = 1) +
-  ggtitle("Summary of Muck Characteristics by Site") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(axis.text=element_text(size=13), axis.title=element_text(size=15), legend.text=element_text(size=11), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=13))
 
+tiff('LWS MkC C.tiff', units="in", width=10, height=6, res=300)
+#plot(x,y)
+dev.off()
+
+#Make gray-scale graph#
+ggplot(tgc, aes(x=Site, y=value, fill=variable))+
+  geom_bar(position=position_dodge(), stat="identity", colour="black", size=0.3)+
+  geom_errorbar(aes(ymin=value-se, ymax=value+se), size=0.3, width=0.2, position=position_dodge(0.9))+
+  xlab("Site")+
+  ylab("Percentage")+
+  theme(axis.text.x  = element_text(angle=45, hjust=1))+
+  scale_x_discrete(labels=c("Barber Bridge", "Fort Pierce", "Harbor Branch Channel", "Harbortown Marina", "Hobe Sound", "Jensen Beach", "Jupiter Narrows", "Linkport", "Manatee Pocket", "Melbourne Causeway", "Merritt Island Causeway", "Middle Estuary", "North Fork", "Round Island", "Sebastian Inlet", "South Fork", "South Fork 2", "Vero Beach", "Vero Beach Marina"))+
+  scale_fill_manual(name="Muck Characteristic", breaks=c("Water.Content", "X..fines", "Loss.On.Ignition.aka.Total.Organic.Matter"), labels=c("Water Content", "Percent Silt/Clay", "Total Organic Matter"), values = c("black", "darkgray", "lightgray")) + 
+  geom_hline(yintercept=60, linetype="dashed", color = "darkgray", size = 1) +
+  geom_hline(yintercept=75, linetype="dashed", color = "black", size = 1) +
+  geom_hline(yintercept=10, linetype="dashed", color = "lightgray", size = 1) +
+  #ggtitle("Summary of Muck Characteristics by Site") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+    theme(axis.text=element_text(size=13), axis.title=element_text(size=15), legend.text=element_text(size=11), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=13))
+
+#Export as a tiff#
+tiff('LWS MkC GS.tiff', units="in", width=10, height=6, res=300)
+#plot(x,y)
+dev.off()
+
+  
 ###MAKE FIGURE 4###
 ggplot(data = LWSS_Enviro, aes( x = Loss.On.Ignition.aka.Total.Organic.Matter, y = Cu, color=Site, shape=Muck)) +
   geom_point(size=2) +
@@ -334,10 +460,16 @@ ggplot(data = LWSS_Enviro, aes( x = Loss.On.Ignition.aka.Total.Organic.Matter, y
   geom_vline(xintercept=10, linetype="dashed", color = "blue") +
   xlab("Total Organic Matter (%)") +
   ylab("Copper Concentration (µg/g)") +
-  ggtitle("Copper Concentration vs. Total Organic Matter") +
-  scale_colour_manual(values=c("midnightblue", "blue", "red", "purple", "yellow", "violet", "maroon", "darkgreen", "dodgerblue", "gold",  "moccasin",  "darkgray", "powderblue", "green", "lightgray", "black", "slateblue", "greenyellow", "lightseagreen")) +
+  #ggtitle("Copper Concentration vs. Total Organic Matter") +
+  scale_colour_manual(values=c("lightblue", "blue", "pink", "red", "khaki", "yellow", "green", "darkgreen", "orchid", "darkorchid",  "lightgray",  "darkgray", "black", "coral", "chocolate", "cyan", "aquamarine", "rosybrown", "thistle"),labels=c("Barber Bridge", "Fort Pierce", "Harbor Branch Channel", "Harbortown Marina", "Hobe Sound", "Jensen Beach", "Jupiter Narrows", "Linkport", "Manatee Pocket", "Melbourne Causeway", "Merritt Island Causeway", "Middle Estuary", "North Fork", "Round Island", "Sebastian Inlet", "South Fork", "South Fork 2", "Vero Beach", "Vero Beach Marina")) +
   theme(plot.title = element_text(hjust = 0.5)) + 
-  scale_shape_discrete(name="Number of Muck Characteristics", limits=c("Muck", "Mucky", "Muckish", "Not"), labels=c("3", "2", "1", "0"))
+  scale_shape_discrete(name="Number of Muck Characteristics", limits=c("Muck", "Mucky", "Muckish", "Not"), labels=c("3", "2", "1", "0")) + 
+  theme(axis.text=element_text(size=13), axis.title=element_text(size=15), legend.text=element_text(size=11), legend.key.size = unit(0.7,"cm"), legend.title=element_text(size=13))
+
+#Export as a tiff#
+tiff('LWS TOM vs Cu.tiff', units="in", width=9, height=8, res=300)
+#plot(x,y)
+dev.off()
 
 ###ALPHA DIVERSITY###
 "Estimate alpha diversity and export it"
