@@ -7,6 +7,10 @@
 #When analysis was done for disseration QIIME2 was ran with all 483 disseration samples, 
 #thus differences in sequences and ASVs may exist if this is only data set being analyzed#
 
+#Note on Muck Subcategory: Biosample = Manuscript: Muck = 3 muck characteristics (3MC), Mucky = 2 muck characteristics (2MC), Muckish = 1 muck characteristics (1MC), Not = 0 muck characteristics (0MC)#
+
+#Note on TOM/Cu aka LOI.Cu Subcategory: Biosample = Manuscript: High.High = high total organic matter (TOM)/low copper (Cu) (HiHi); High-Low = high TOM/low Cu (HiLo); Low-Low = low TOM/low Cu (LoLo); Low-High = low TOM/high Cu (LoHi)#
+
 #Load libraries#
 library(phyloseq)
 library(vegan)
@@ -158,7 +162,13 @@ ggplot(Temp_SS, aes(x=Sampling.Period, y=value, fill=factor(Year, levels =c("201
   ggtitle("IRL Wide NWS Average Temperature (°C) by Sampling Period") +
   theme(plot.title = element_text(hjust = 0.5)) +
   coord_cartesian(ylim=c(18,30))+
-  scale_fill_manual(name="Year(s)", values=(c("chocolate", "seagreen", "chocolate1", "seagreen1", "grey20")), breaks=c("2016", "2017a", "2017b", "2018", "1990-2018"))
+  scale_fill_manual(name="Year(s)", values=(c("chocolate", "seagreen", "chocolate1", "seagreen1", "grey20")), breaks=c("2016", "2017a", "2017b", "2018", "1990-2018"))+
+  theme(axis.text=element_text(size=14), axis.title=element_text(size=16), legend.text=element_text(size=12), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=14))
+
+#Export as a tiff#                         
+tiff('LWS NWS SP Temp.tiff', units="in", width=10, height=6, res=300)
+#plot(x,y)
+dev.off()
 
 ###MAKE FIGURE S1B###
 #Upload table containing the year or years in the first column, the monthly means from Jan to Dec in columns 2-13, and the last column containing the sensor location#
@@ -191,7 +201,13 @@ ggplot(Rain_SS, aes(x=Sampling.Period, y=value, fill=factor(Year, levels =c("201
   theme(axis.text.x  = element_text(angle=45, hjust=1))+
   ggtitle("IRL Wide NWS Average Rain Sum (mm) by Sampling Period") +
   theme(plot.title = element_text(hjust = 0.5))+
-  scale_fill_manual(name="Year(s)", values=(c("chocolate", "seagreen", "chocolate1", "seagreen1", "grey20")), breaks=c("2016", "2017a", "2017b", "2018", "1990-2018"))
+  scale_fill_manual(name="Year(s)", values=(c("chocolate", "seagreen", "chocolate1", "seagreen1", "grey20")), breaks=c("2016", "2017a", "2017b", "2018", "1990-2018"))+
+  theme(axis.text=element_text(size=14), axis.title=element_text(size=16), legend.text=element_text(size=12), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=14))
+
+#Export as a tiff#                         
+tiff('LWS NWS SP Rain Sum.tiff', units="in", width=10, height=6, res=300)
+#plot(x,y)
+dev.off()
 
 ####SUMMARIZE STREAMFLOW INFO FOR TABLE S2####
 #Upload streamflow information with the first column listing the Stream/Canal, the second listing one of the periods being tested or Not Tested for a monthly average that will not be used, and column three with the monlty average from USGS or SFWMD#
@@ -521,7 +537,7 @@ wilcox.test(Shannon ~ Estuary, data = RFLWSS_alpha_diversity)
 #Determine summary stats#
 ddply(RFLWSS_alpha_diversity, .(Estuary), summarise, mean=mean(Shannon), sd=sd(Shannon), median=median(Shannon), IQR=IQR(Shannon))
 
-#Test Shannon Diversity at LOI.Cu level#
+#Test Shannon Diversity at TOM/Cu level#
 #Test for overall significance#
 kruskal.test(Shannon ~ LOI.Cu, data = RFLWSS_alpha_diversity)
 #Test for pairwise significance#
@@ -589,7 +605,7 @@ alpha_div_p.value$padj <- p.adjust(alpha_div_p.value$alpha_div_p.value, method =
 alpha_div_p.value
 
 ###MAKE FIGURE 5A###
-#Make a boxplot#
+#Make a color boxplot#
 ggplot(RFLWSS_alpha_diversity, aes(x=Estuary.Sampling, y=Shannon, color=Estuary.Sampling)) + 
   geom_boxplot() +
   theme(axis.text.x  = element_text(angle=45, hjust=1)) + 
@@ -597,12 +613,55 @@ ggplot(RFLWSS_alpha_diversity, aes(x=Estuary.Sampling, y=Shannon, color=Estuary.
   scale_color_manual(values=c("seagreen4", "seagreen3", "seagreen2", "seagreen1", "chocolate4", "chocolate3", "chocolate2", "chocolate1"), limits=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("IRL Aug/Sept 2016", "IRL Mar/Apr 2017", "IRL Oct/Nov 2017", "IRL Apr 2018", "SLE Aug/Sept 2016", "SLE Mar/Apr 2017", "SLE Oct/Nov 2017", "SLE Apr 2018")) +
   scale_x_discrete(limits=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("IRL Aug/Sept 2016", "IRL Mar/Apr 2017", "IRL Oct/Nov 2017", "IRL Apr 2018", "SLE Aug/Sept 2016", "SLE Mar/Apr 2017", "SLE Oct/Nov 2017", "SLE Apr 2018"))
 
+#Export as a tiff#
+tiff('LWS Shannon by Est by SP C.tiff', units="in", width=10, height=6, res=300)
+#plot(x,y)
+dev.off()
+
+#Make a grey-scale boxplot#
+ggplot(RFLWSS_alpha_diversity, aes(x=Estuary.Sampling, y=Shannon)) + 
+  geom_boxplot() +
+  theme(axis.text.x  = element_text(angle=45, hjust=1)) + 
+  xlab("Sampling Period") +
+  scale_x_discrete(limits=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("Aug/Sept 2016", "Mar/Apr 2017", "Oct/Nov 2017", "Apr 2018", "Aug/Sept 2016", "Mar/Apr 2017", "Oct/Nov 2017", "Apr 2018"))+
+  annotate("text", x = c(1:8) , y = c(7.1, 7.05, 6.75, 7.0, 7.05, 6.9, 6.6, 6.95), label = c("a", "b", "c", "b", "d", "e", "f", "e"), size=5)+
+  annotate("segment", x=0.5, xend=4.45, y=7.15, yend=7.15)+
+  annotate("segment", x=4.55, xend=8.5, y=7.15, yend=7.15)+
+  annotate("text", x=2.5, y=7.2, label="IRL", size=5)+
+  annotate("text", x=6.5, y=7.2, label="SLE", size=5)+ 
+  theme(axis.text=element_text(size=13), axis.title=element_text(size=15), legend.text=element_text(size=11), legend.key.size = unit(0.7,"cm"), legend.title=element_text(size=13))
+
+#Export as a tiff#
+tiff('LWS Shannon by Est by SP GS.tiff', units="in", width=10, height=6, res=300)
+#plot(x,y)
+dev.off()
+
 #MAKE FIGURE 5B#
 ggplot(RFLWSS_alpha_diversity, aes(x=Location, y=Shannon, color=Location)) + 
   scale_color_manual(values=c("seagreen4", "seagreen3", "seagreen2", "seagreen1", "chocolate4"), labels=c("North IRL", "North Central IRL", "South Central IRL", "South IRL", "SLE"), limits=c("North", "North Central", "South Central", "South", "SLE")) +
   scale_x_discrete(limits=c("North", "North Central", "South Central", "South", "SLE"), labels=c("North IRL", "North Central IRL", "South Central IRL", "South IRL", "SLE")) +
   geom_boxplot() +
   theme(axis.text.x  = element_text(angle=45, hjust=1))
+
+#Export as a tiff#
+tiff('LWS Shannon by Loc.tiff', units="in", width=10, height=6, res=300)
+#plot(x,y)
+dev.off()
+
+#Make a grey-scale boxplot#
+ggplot(RFLWSS_alpha_diversity, aes(x=Location, y=Shannon)) + 
+  scale_x_discrete(limits=c("North", "North Central", "South Central", "South", "SLE"), labels=c("North", "North Central", "South Central", "South", "SLE")) +
+  geom_boxplot() +
+  theme(axis.text.x  = element_text(angle=45, hjust=1))+
+  annotate("text", x = c(1:5) , y = c(7.05, 7.05, 7.08, 7.05, 7.05), label = c("a", "ab", "b", "b", "b"), size=5)+
+  annotate("segment", x=0.5, xend=4.45, y=7.12, yend=7.12)+
+  annotate("text", x=2.5, y=7.16, label="IRL", size=5)+
+  theme(axis.text=element_text(size=13), axis.title=element_text(size=15), legend.text=element_text(size=11), legend.key.size = unit(0.7,"cm"), legend.title=element_text(size=13))
+
+#Export as a tiff#
+tiff('LWS Shannon by Loc GS.tiff', units="in", width=10, height=6, res=300)
+#plot(x,y)
+dev.off()
 
 ###MAKE SETS OF MERGED BAR GRAPHS BY METADATA CATEGORY FOR LWSS SURVEY###
 
@@ -827,11 +886,18 @@ OneSpeciesdatAb2 <- rbind(dat, Abundance)
 spatial_plot_LWSS_Phylum2 <- ggplot(data=OnePhylumdatAb2, aes(x=Estuary, y=Abundance, fill=Phylum)) +
   geom_bar(aes(), stat="identity", position="stack", color="black") + 
   theme(axis.text.x  = element_text(angle=45, hjust=1)) +
-  scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "purple",  "rosybrown"))+
+  scale_fill_manual("Phylum", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "purple",  "rosybrown"))+
   xlab("Estuary") +
   ylab("Percentage") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
 spatial_plot_LWSS_Phylum2
+
+#Export as a tiff#                   
+tiff('LWS Phyla by Est.tiff', units="in", width=8, height=8, res=300)
+spatial_plot_LWSS_Phylum2
+dev.off()
+
 
 #Make IRL Class graph, FIGURE S2B#
 spatial_plot_LWSS_Class2 <- ggplot(OneClassdatAb2, aes(x=Estuary, y=Abundance, fill=Class)) +
@@ -840,8 +906,14 @@ spatial_plot_LWSS_Class2 <- ggplot(OneClassdatAb2, aes(x=Estuary, y=Abundance, f
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "rosybrown"))+
   xlab("Estuary") +
   ylab("Percentage") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
 spatial_plot_LWSS_Class2
+
+#Export as a tiff#                   
+tiff('LWS Classes by Est.tiff', units="in", width=8, height=8, res=300)
+spatial_plot_LWSS_Class2
+dev.off()
 
 #Make IRL Order graph, FIGURE 6A#
 spatial_plot_LWSS_Order2 <- ggplot(data=OneOrderdatAb2, aes(x=Estuary, y=Abundance, fill=Order)) +
@@ -850,8 +922,14 @@ spatial_plot_LWSS_Order2 <- ggplot(data=OneOrderdatAb2, aes(x=Estuary, y=Abundan
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "purple", "lightblue", "orangered", "firebrick3", "darkseagreen3", "navy", "black", "seagreen", "turquoise", "darkorchid3", "gold3", "darkolivegreen", "hotpink", "lawngreen", "rosybrown"))+
   xlab("Estuary") +
   ylab("Percentage") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
 spatial_plot_LWSS_Order2
+
+#Export as a tiff#                   
+tiff('LWS Orders by Est.tiff', units="in", width=12, height=6, res=300)
+spatial_plot_LWSS_Order2
+dev.off()
 
 #Make IRL Family graph, FIGURE S2C#
 spatial_plot_LWSS_Family2 <- ggplot(data=OneFamilydatAb2, aes(x=Estuary, y=Abundance, fill=Family)) +
@@ -860,8 +938,14 @@ spatial_plot_LWSS_Family2 <- ggplot(data=OneFamilydatAb2, aes(x=Estuary, y=Abund
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "purple", "lightblue", "orangered", "firebrick3", "rosybrown"))+
   xlab("Estuary") +
   ylab("Percentage") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
 spatial_plot_LWSS_Family2
+
+#Export as a tiff#                   
+tiff('LWS Families by Est.tiff', units="in", width=9, height=8, res=300)
+spatial_plot_LWSS_Family2
+dev.off()
 
 #Make IRL Genus Graph, FIGURE S2D#
 spatial_plot_LWSS_Genus2 <- ggplot(data=OneGenusdatAb2, aes(x=Estuary, y=Abundance, fill=Genus)) +
@@ -870,8 +954,14 @@ spatial_plot_LWSS_Genus2 <- ggplot(data=OneGenusdatAb2, aes(x=Estuary, y=Abundan
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "rosybrown"))+
   xlab("Estuary") +
   ylab("Percentage") +
-  theme(plot.title = element_text(hjust = 0.5)) 
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
 spatial_plot_LWSS_Genus2
+
+#Export as a tiff#                   
+tiff('LWS Genera by Est.tiff', units="in", width=10, height=8, res=300)
+spatial_plot_LWSS_Genus2
+dev.off()
 
 ##CREATE ESTUARY BY SAMPLING PERIOD TABLE FOR BAR GRAPH, FIGURE S3##
 ##Create table ready for making stacked bar graph for Orders >1% by Estuary.Sampling##
@@ -915,6 +1005,11 @@ spatial_plot_LWSS_Estuary.Sampling_Order2 <- ggplot(data=Estuary.SamplingOrderda
   scale_x_discrete(limits=c("IRL-W16", "IRL-D17", "IRL-W17", "IRL-D18", "SLE-W16", "SLE-D17", "SLE-W17", "SLE-D18"), labels=c("IRL Aug/Sept 2016", "IRL Mar/Apr 2017", "IRL Oct/Nov 2017", "IRL Apr 2018", "SLE Aug/Sept 2016", "SLE Mar/Apr 2017", "SLE Oct/Nov 2017", "SLE Apr 2018"))
 spatial_plot_LWSS_Estuary.Sampling_Order2
 
+#Export as a tiff#                   
+tiff('LWS Orders by Est by SP.tiff', units="in", width=9, height=5, res=300)
+spatial_plot_LWSS_Estuary.Sampling_Order2
+dev.off()                   
+                   
 ###CREATE FIGURES 6B AND S4A-D
 ##CREATE MUCK FOCUSED TABLES FOR BAR GRAPHS##
 ##Create table ready for making stacked bar graph for Phylums >1%  by Muck##
@@ -1112,10 +1207,16 @@ spatial_plot_LWSS_Muck_Phylum2 <- ggplot(data=MuckPhylumdatAb2MN, aes(x=Muck, y=
   geom_bar(aes(), stat="identity", position="stack", color="black") + 
   theme(axis.text.x  = element_text(angle=45, hjust=1)) +
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "purple", "lightblue", "orangered", "firebrick3", "darkseagreen3", "navy", "black", "seagreen", "turquoise", "darkorchid3", "gold3", "darkolivegreen", "hotpink", "lawngreen", "rosybrown"))+
-  xlab("Muck") +
+  xlab("Muck Characteristics") +
+  scale_x_discrete(limits=c("Muck","Not"), labels=c("3", "0"))+
   ylab("Percentage") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
 spatial_plot_LWSS_Muck_Phylum2
+                   
+tiff('LWS Phyla by MkC.tiff', units="in", width=8, height=8, res=300)
+spatial_plot_LWSS_Muck_Phylum2
+dev.off()
 
 #Make LWSS Muck Class graph, FIGURE S4B#
 MuckClassdatAb2M <- filter(MuckClassdatAb2, Muck==c("Muck"))
@@ -1125,10 +1226,17 @@ spatial_plot_LWSS_Muck_Class2 <- ggplot(MuckClassdatAb2MN, aes(x=Muck, y=Abundan
   geom_bar(aes(), stat="identity", position="stack", color="black") + 
   theme(axis.text.x  = element_text(angle=45, hjust=1)) +
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "rosybrown"))+
-  xlab("Muck") +
+  xlab("Muck Characteristics") +
+  scale_x_discrete(limits=c("Muck","Not"), labels=c("3", "0"))+
   ylab("Percentage") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
 spatial_plot_LWSS_Muck_Class2
+
+#Export as a tiff#                   
+tiff('LWS Classes by MkC.tiff', units="in", width=8, height=8, res=300)
+spatial_plot_LWSS_Muck_Class2
+dev.off()
 
 #Make LWSS Muck Order graph, FIGURE 6B#
 MuckOrderdatAb2M <- filter(MuckOrderdatAb2, Muck==c("Muck"))
@@ -1138,10 +1246,17 @@ spatial_plot_LWSS_Muck_Order2 <- ggplot(data=MuckOrderdatAb2MN, aes(x=Muck, y=Ab
   geom_bar(aes(), stat="identity", position="stack", color="black") + 
   theme(axis.text.x  = element_text(angle=45, hjust=1)) +
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "purple", "lightblue", "orangered", "firebrick3", "darkseagreen3", "navy", "black", "seagreen", "turquoise", "darkorchid3", "gold3", "darkolivegreen", "hotpink", "lawngreen", "rosybrown"))+
-  xlab("Muck") +
+  xlab("Muck Characteristics") +
+  scale_x_discrete(limits=c("Muck","Not"), labels=c("3", "0"))+
   ylab("Percentage") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
 spatial_plot_LWSS_Muck_Order2
+
+#Export as a tiff#                   
+tiff('LWS Orders by MkC.tiff', units="in", width=12, height=6, res=300)
+spatial_plot_LWSS_Muck_Order2
+dev.off()
 
 #Make LWSS Muck Family graph, FIGURE S4C#
 MuckFamilydatAb2M <- filter(MuckFamilydatAb2, Muck==c("Muck"))
@@ -1151,10 +1266,17 @@ spatial_plot_LWSS_Muck_Family2 <- ggplot(data=MuckFamilydatAb2MN, aes(x=Muck, y=
   geom_bar(aes(), stat="identity", position="stack", color="black") + 
   theme(axis.text.x  = element_text(angle=45, hjust=1)) +
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "purple", "lightblue", "orangered", "firebrick3", "rosybrown"))+
-  xlab("Muck") +
+  xlab("Muck Characteristics") +
+  scale_x_discrete(limits=c("Muck","Not"), labels=c("3", "0"))+
   ylab("Percentage") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
 spatial_plot_LWSS_Muck_Family2
+
+#Export as a tiff#                   
+tiff('LWS Families by MkC.tiff', units="in", width=9, height=8, res=300)
+spatial_plot_LWSS_Muck_Family2
+dev.off()
 
 #Make LWSS Muck Genus Graph, FIGURE S4D#
 MuckGenusdatAb2M <- filter(MuckGenusdatAb2, Muck==c("Muck"))
@@ -1164,14 +1286,21 @@ spatial_plot_LWSS_Muck_Genus2 <- ggplot(data=MuckGenusdatAb2MN, aes(x=Muck, y=Ab
   geom_bar(aes(), stat="identity", position="stack", color="black") + 
   theme(axis.text.x  = element_text(angle=45, hjust=1)) +
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "rosybrown"))+
-  xlab("Muck") +
+  xlab("Muck Characteristics") +
+  scale_x_discrete(limits=c("Muck","Not"), labels=c("3", "0"))+
   ylab("Percentage") +
-  theme(plot.title = element_text(hjust = 0.5)) 
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
 spatial_plot_LWSS_Muck_Genus2
 
+#Export as a tiff#                   
+tiff('LWS Genera by MkC.tiff', units="in", width=10, height=8, res=300)
+spatial_plot_LWSS_Muck_Genus2
+dev.off()
+                   
 ###CREATE FIGURES 6C AND S5A-D
-##CREATE LOI.Cu FOCUSED TABLES FOR BAR GRAPHS##
-##Create table ready for making stacked bar graph for Phylums >1%  by LOI.Cu##
+##CREATE TOM/Cu FOCUSED TABLES FOR BAR GRAPHS##
+##Create table ready for making stacked bar graph for Phylums >1%  by TOM/Cu##
 # agglomerate taxa
 glom <- tax_glom(LWSSphy, taxrank = 'Phylum')
 # create dataframe from phyloseq object
@@ -1199,9 +1328,9 @@ Abundance$Phylum<- "Other Prokaryotes"
 #remove unnessary columns
 dat <- subset(dat, select=c(LOI.Cu, Abundance, Phylum))
 #combine with original table
-LOI.CuPhylumdatAb2 <- rbind(dat, Abundance)
+TOM.CuPhylumdatAb2 <- rbind(dat, Abundance)
 
-##Create table ready for making stacked bar graph for Classes >1% by LOI.Cu##
+##Create table ready for making stacked bar graph for Classes >1% by TOM/Cu##
 # agglomerate taxa
 glom <- tax_glom(LWSSphy, taxrank = 'Class')
 # create dataframe from phyloseq object
@@ -1229,9 +1358,9 @@ Abundance$Class<- "Other Prokaryotes"
 #remove unnessary columns
 dat <- subset(dat, select=c(LOI.Cu, Abundance, Class))
 #combine with original table
-LOI.CuClassdatAb2 <- rbind(dat, Abundance)
+TOM.CuClassdatAb2 <- rbind(dat, Abundance)
 
-##Create table ready for making stacked bar graph for Orders >1% by LOI.Cu##
+##Create table ready for making stacked bar graph for Orders >1% by TOM/Cu##
 # agglomerate taxa
 glom <- tax_glom(LWSSphy, taxrank = 'Order')
 # create dataframe from phyloseq object
@@ -1259,9 +1388,9 @@ Abundance$Order<- "Other Prokaryotes"
 #remove unnessary columns
 dat <- subset(dat, select=c(LOI.Cu, Abundance, Order))
 #combine with original table
-LOI.CuOrderdatAb2 <- rbind(dat, Abundance)
+TOM.CuOrderdatAb2 <- rbind(dat, Abundance)
 
-##Create table ready for making stacked bar graph for Families >1% by LOI.Cu##
+##Create table ready for making stacked bar graph for Families >1% by TOM/Cu##
 # agglomerate taxa
 glom <- tax_glom(LWSSphy, taxrank = 'Family')
 # create dataframe from phyloseq object
@@ -1289,9 +1418,9 @@ Abundance$Family<- "Other Prokaryotes"
 #remove unnessary columns
 dat <- subset(dat, select=c(LOI.Cu, Abundance, Family))
 #combine with original table
-LOI.CuFamilydatAb2 <- rbind(dat, Abundance)
+TOM.CuFamilydatAb2 <- rbind(dat, Abundance)
 
-##Create table ready for making stacked bar graph for Genera >1%by LOI.Cu##
+##Create table ready for making stacked bar graph for Genera >1%by TOM/Cu##
 # agglomerate taxa
 glom <- tax_glom(LWSSphy, taxrank = 'Genus')
 # create dataframe from phyloseq object
@@ -1321,9 +1450,9 @@ Abundance$Genus<- "Other Prokaryotes"
 #remove unnessary columns
 dat <- subset(dat, select=c(LOI.Cu, Abundance, Genus))
 #combine with original table
-LOI.CuGenusdatAb2 <- rbind(dat, Abundance)
+TOM.CuGenusdatAb2 <- rbind(dat, Abundance)
 
-##Create table ready for making stacked bar graph for Species >1% by LOI.Cu##
+##Create table ready for making stacked bar graph for Species >1% by TOM/Cu##
 # agglomerate taxa
 glom <- tax_glom(LWSSphy, taxrank = 'Species')
 # create dataframe from phyloseq object
@@ -1354,78 +1483,107 @@ Abundance$Species<- "Other Prokaryotes"
 #remove unnessary columns
 dat <- subset(dat, select=c(LOI.Cu, Abundance, Species))
 #combine with original table
-LOI.CuSpeciesdatAb2 <- rbind(dat, Abundance)
+TOM.CuSpeciesdatAb2 <- rbind(dat, Abundance)
 
 
-##CREATE LOI.Cu FOCUSED BAR GRAPHS##
-#Make LWSS LOI.Cu Phylum graph, FIGURE S5A#
-LOI.CuPhylumdatAb2HH <- filter(LOI.CuPhylumdatAb2, LOI.Cu==c("High-High"))
-LOI.CuPhylumdatAb2HL <- filter(LOI.CuPhylumdatAb2, LOI.Cu==c("High-Low"))
-LOI.CuPhylumdatAb2HHHL <- rbind(LOI.CuPhylumdatAb2HH, LOI.CuPhylumdatAb2HL)
-spatial_plot_LWSS_LOI.Cu_Phylum2 <- ggplot(data=LOI.CuPhylumdatAb2HHHL, aes(x=LOI.Cu, y=Abundance, fill=Phylum)) +
+##CREATE TOM/Cu FOCUSED BAR GRAPHS##
+#Make LWSS TOM/Cu Phylum graph, FIGURE S5A#
+TOM.CuPhylumdatAb2HH <- filter(TOM.CuPhylumdatAb2, LOI.Cu==c("High-High"))
+TOM.CuPhylumdatAb2HL <- filter(TOM.CuPhylumdatAb2, LOI.Cu==c("High-Low"))
+TOM.CuPhylumdatAb2HHHL <- rbind(TOM.CuPhylumdatAb2HH, TOM.CuPhylumdatAb2HL)
+spatial_plot_LWSS_TOM.Cu_Phylum2 <- ggplot(data=TOM.CuPhylumdatAb2HHHL, aes(x=LOI.Cu, y=Abundance, fill=Phylum)) +
   geom_bar(aes(), stat="identity", position="stack", color="black") + 
   theme(axis.text.x  = element_text(angle=45, hjust=1)) +
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "purple", "rosybrown"))+
   xlab("TOM/Cu") +
   ylab("Percentage") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  scale_x_discrete(labels=c("High/High", "High/Low"))
+  scale_x_discrete(labels=c("HiHi", "HiLo"))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
+spatial_plot_LWSS_TOM.Cu_Phylum2
 
-spatial_plot_LWSS_LOI.Cu_Phylum2
+#Export as a tiff#                   
+tiff('LWS Phyla by TOM/Cu.tiff', units="in", width=8, height=8, res=300)
+spatial_plot_LWSS_TOM.Cu_Phylum2
+dev.off()
 
-#Make LWSS LOI.Cu Class graph, FIGURE S5B#
-LOI.CuClassdatAb2HH <- filter(LOI.CuClassdatAb2, LOI.Cu==c("High-High"))
-LOI.CuClassdatAb2HL <- filter(LOI.CuClassdatAb2, LOI.Cu==c("High-Low"))
-LOI.CuClassdatAb2HHHL <- rbind(LOI.CuClassdatAb2HH, LOI.CuClassdatAb2HL)
-spatial_plot_LWSS_LOI.Cu_Class2 <- ggplot(LOI.CuClassdatAb2HHHL, aes(x=LOI.Cu, y=Abundance, fill=Class)) +
+#Make LWSS TOM/Cu Class graph, FIGURE S5B#
+TOM.CuClassdatAb2HH <- filter(TOM.CuClassdatAb2, LOI.Cu==c("High-High"))
+TOM.CuClassdatAb2HL <- filter(TOM.CuClassdatAb2, LOI.Cu==c("High-Low"))
+TOM.CuClassdatAb2HHHL <- rbind(TOM.CuClassdatAb2HH, TOM.CuClassdatAb2HL)
+spatial_plot_LWSS_TOM.Cu_Class2 <- ggplot(TOM.CuClassdatAb2HHHL, aes(x=LOI.Cu, y=Abundance, fill=Class)) +
   geom_bar(aes(), stat="identity", position="stack", color="black") + 
   theme(axis.text.x  = element_text(angle=45, hjust=1)) +
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "rosybrown"))+
   xlab("TOM/Cu") +
   ylab("Percentage") +
   theme(plot.title = element_text(hjust = 0.5))+
-  scale_x_discrete(labels=c("High/High", "High/Low"))
-spatial_plot_LWSS_LOI.Cu_Class2
+  scale_x_discrete(labels=c("HiHi", "HiLo"))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
+spatial_plot_LWSS_TOM.Cu_Class2
 
-#Make LWSS LOI.Cu Order graph, FIGURE 6C#
-LOI.CuOrderdatAb2HH <- filter(LOI.CuOrderdatAb2, LOI.Cu==c("High-High"))
-LOI.CuOrderdatAb2HL <- filter(LOI.CuOrderdatAb2, LOI.Cu==c("High-Low"))
-LOI.CuOrderdatAb2HHHL <- rbind(LOI.CuOrderdatAb2HH, LOI.CuOrderdatAb2HL)
-spatial_plot_LWSS_LOI.Cu_Order2 <- ggplot(data=LOI.CuOrderdatAb2HHHL, aes(x=LOI.Cu, y=Abundance, fill=Order)) +
+#Export as a tiff#                   
+tiff('LWS Classes by TOM/Cu.tiff', units="in", width=8, height=8, res=300)
+spatial_plot_LWSS_TOM.Cu_Class2
+dev.off()
+
+#Make LWSS TOM/Cu Order graph, FIGURE 6C#
+TOM.CuOrderdatAb2HH <- filter(TOM.CuOrderdatAb2, LOI.Cu==c("High-High"))
+TOM.CuOrderdatAb2HL <- filter(TOM.CuOrderdatAb2, LOI.Cu==c("High-Low"))
+TOM.CuOrderdatAb2HHHL <- rbind(TOM.CuOrderdatAb2HH, TOM.CuOrderdatAb2HL)
+spatial_plot_LWSS_TOM.Cu_Order2 <- ggplot(data=TOM.CuOrderdatAb2HHHL, aes(x=LOI.Cu, y=Abundance, fill=Order)) +
   geom_bar(aes(), stat="identity", position="stack", color="black") + 
   theme(axis.text.x  = element_text(angle=45, hjust=1)) +
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "purple", "lightblue", "orangered", "firebrick3", "darkseagreen3", "navy", "black", "seagreen", "turquoise", "darkorchid3", "gold3", "darkolivegreen", "hotpink", "lawngreen", "rosybrown"))+
   xlab("TOM/Cu") +
   ylab("Percentage") +
   theme(plot.title = element_text(hjust = 0.5))+
-  scale_x_discrete(labels=c("High/High", "High/Low"))
-spatial_plot_LWSS_LOI.Cu_Order2
+  scale_x_discrete(labels=c("HiHi", "HiLo"))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
+spatial_plot_LWSS_TOM.Cu_Order2
 
-#Make LWSS LOI.Cu Family graph, FIGURE S5C#
-LOI.CuFamilydatAb2HH <- filter(LOI.CuFamilydatAb2, LOI.Cu==c("High-High"))
-LOI.CuFamilydatAb2HL <- filter(LOI.CuFamilydatAb2, LOI.Cu==c("High-Low"))
-LOI.CuFamilydatAb2HHHL <- rbind(LOI.CuFamilydatAb2HH, LOI.CuFamilydatAb2HL)
-spatial_plot_LWSS_LOI.Cu_Family2 <- ggplot(data=LOI.CuFamilydatAb2HHHL, aes(x=LOI.Cu, y=Abundance, fill=Family)) +
+#Export as a tiff#                   
+tiff('LWS Orders by TOM/Cu.tiff', units="in", width=12, height=6, res=300)
+spatial_plot_LWSS_TOM.Cu_Order2
+dev.off()
+
+#Make LWSS TOM/Cu Family graph, FIGURE S5C#
+TOM.CuFamilydatAb2HH <- filter(TOM.CuFamilydatAb2, LOI.Cu==c("High-High"))
+TOM.CuFamilydatAb2HL <- filter(TOM.CuFamilydatAb2, LOI.Cu==c("High-Low"))
+TOM.CuFamilydatAb2HHHL <- rbind(TOM.CuFamilydatAb2HH, TOM.CuFamilydatAb2HL)
+spatial_plot_LWSS_TOM.Cu_Family2 <- ggplot(data=TOM.CuFamilydatAb2HHHL, aes(x=LOI.Cu, y=Abundance, fill=Family)) +
   geom_bar(aes(), stat="identity", position="stack", color="black") + 
   theme(axis.text.x  = element_text(angle=45, hjust=1)) +
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "dodgerblue", "purple", "lightblue", "orangered", "firebrick3", "rosybrown"))+
   xlab("TOM/Cu") +
   ylab("Percentage") +
   theme(plot.title = element_text(hjust = 0.5))+
-  scale_x_discrete(labels=c("High/High", "High/Low"))
-spatial_plot_LWSS_LOI.Cu_Family2
+  scale_x_discrete(labels=c("HiHi", "HiLo"))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
+spatial_plot_LWSS_TOM.Cu_Family2
 
-#Make LWSS LOI.Cu Genus Graph, FIGURE S5D#
-LOI.CuGenusdatAb2HH <- filter(LOI.CuGenusdatAb2, LOI.Cu==c("High-High"))
-LOI.CuGenusdatAb2HL <- filter(LOI.CuGenusdatAb2, LOI.Cu==c("High-Low"))
-LOI.CuGenusdatAb2HHHL <- rbind(LOI.CuGenusdatAb2HH, LOI.CuGenusdatAb2HL)
-spatial_plot_LWSS_LOI.Cu_Genus2 <- ggplot(data=LOI.CuGenusdatAb2HHHL, aes(x=LOI.Cu, y=Abundance, fill=Genus)) +
+#Export as a tiff#                   
+tiff('LWS Families by TOM/Cu.tiff', units="in", width=9, height=8, res=300)
+spatial_plot_LWSS_TOM.Cu_Family2
+dev.off()
+
+#Make LWSS TOM/Cu Genus Graph, FIGURE S5D#
+TOM.CuGenusdatAb2HH <- filter(TOM.CuGenusdatAb2, LOI.Cu==c("High-High"))
+TOM.CuGenusdatAb2HL <- filter(TOM.CuGenusdatAb2, LOI.Cu==c("High-Low"))
+TOM.CuGenusdatAb2HHHL <- rbind(TOM.CuGenusdatAb2HH, TOM.CuGenusdatAb2HL)
+spatial_plot_LWSS_TOM.Cu_Genus2 <- ggplot(data=TOM.CuGenusdatAb2HHHL, aes(x=LOI.Cu, y=Abundance, fill=Genus)) +
   geom_bar(aes(), stat="identity", position="stack", color="black") + 
   theme(axis.text.x  = element_text(angle=45, hjust=1)) +
   scale_fill_manual("legend", values=c("salmon", "plum", "saddlebrown", "wheat", "deeppink", "midnightblue", "blue", "red", "yellow", "orange", "green", "maroon", "rosybrown"))+
   xlab("TOM/Cu") +
   ylab("Percentage") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  scale_x_discrete(labels=c("High/High", "High/Low"))
-spatial_plot_LWSS_LOI.Cu_Genus2
+  scale_x_discrete(labels=c("HiHi", "HiLo"))+
+  theme(axis.text=element_text(size=19), axis.title=element_text(size=21), legend.text=element_text(size=17), legend.key.size = unit(0.8,"cm"), legend.title=element_text(size=19))
+spatial_plot_LWSS_TOM.Cu_Genus2
+
+#Export as a tiff#                   
+tiff('LWS Genera by TOM/Cu.tiff', units="in", width=10, height=8, res=300)
+spatial_plot_LWSS_TOM.Cu_Genus2
+dev.off()
 
